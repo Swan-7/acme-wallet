@@ -15,3 +15,12 @@ export const TRANSACTION_STATUS_LABELS: Record<TransactionStatus, string> = {
   pending: 'Pending',
   failed: 'Failed',
 }
+
+/** Types that add money to the wallet they are recorded in. */
+const CREDIT_TYPES: ReadonlySet<TransactionType> = new Set<TransactionType>([
+  'deposit',
+  'transfer_in',
+  'conversion',
+])
+
+export const isCreditType = (type: TransactionType): boolean => CREDIT_TYPES.has(type)
