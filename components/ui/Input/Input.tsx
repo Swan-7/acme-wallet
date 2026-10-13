@@ -25,14 +25,17 @@ export function Input({
 }: InputProps) {
   return (
     <Field label={label} hideLabel={hideLabel} hint={hint} error={error} className={fieldClassName}>
-      <div className={styles.control}>
-        {leadingIcon && <Icon name={leadingIcon} size={16} className={styles.icon} />}
-        <input
-          className={cx(styles.input, leadingIcon && styles.withIcon, error && styles.invalid, className)}
-          aria-invalid={error ? true : undefined}
-          {...rest}
-        />
-      </div>
+      {(control) => (
+        <div className={styles.control}>
+          {leadingIcon && <Icon name={leadingIcon} size={16} className={styles.icon} />}
+          <input
+            className={cx(styles.input, leadingIcon && styles.withIcon, error && styles.invalid, className)}
+            aria-invalid={error ? true : undefined}
+            {...rest}
+            {...control}
+          />
+        </div>
+      )}
     </Field>
   )
 }

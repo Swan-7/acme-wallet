@@ -44,6 +44,11 @@ svg {
   display: block;
 }
 
+/* Lock page scroll while a modal dialog (Drawer) is open. */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
