@@ -12,9 +12,13 @@ export function RatesWidget({ base }: { base: Currency }) {
   const [rates, setRates] = useState<Rate[]>()
 
   useEffect(() => {
-    Promise.all(QUOTES.map((quote) => getRate(quote, base))).then((results) =>
-      setRates(results.map((res) => res.data))
-    )
+    const controller = new AbortController()
+    Promise.all(QUOTES.map((quote) => getRate(quote, base, { signal: controller.signal })))
+      .then((results) => setRates(results.map((res) => res.data)))
+      .catch(() => {
+        // Rates render as "—" when unavailable.
+      })
+    return () => controller.abort()
   }, [base])
   const updatedAt = rates?.[0]?.updatedAt
 

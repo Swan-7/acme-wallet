@@ -16,7 +16,13 @@ export function UserMenu() {
   const [user, setUser] = useState<User>()
 
   useEffect(() => {
-    getMe().then((res) => setUser(res.data))
+    const controller = new AbortController()
+    getMe({ signal: controller.signal })
+      .then((res) => setUser(res.data))
+      .catch(() => {
+        // The menu degrades to an empty avatar; the page itself is unaffected.
+      })
+    return () => controller.abort()
   }, [])
 
   return (

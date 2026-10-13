@@ -1,8 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
-import type { ApiErrorBody, Conversion, Currency, Rate, User } from '@/types/api'
+import type { Conversion, Currency, Rate, User } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
+import { ApiError } from '@/lib/api/client'
 import { convert, getMe, getRate } from '@/lib/api/endpoints'
 import { parseMoney } from '@/lib/format'
 import styles from './page.module.css'
@@ -18,16 +19,26 @@ export default function ConvertPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const [user, setUser] = useState<User>()
-  const [rate, setRate] = useState<Rate>()
+  const [fetchedRate, setFetchedRate] = useState<Rate>()
 
   useEffect(() => {
-    getMe().then((res) => setUser(res.data))
+    const controller = new AbortController()
+    getMe({ signal: controller.signal })
+      .then((res) => setUser(res.data))
+      .catch(() => {})
+    return () => controller.abort()
   }, [])
 
   useEffect(() => {
-    getRate(from, to).then((res) => setRate(res.data))
+    const controller = new AbortController()
+    getRate(from, to, { signal: controller.signal })
+      .then((res) => setFetchedRate(res.data))
+      .catch(() => {})
+    return () => controller.abort()
   }, [from, to])
 
+  // Ignore a rate fetched for a previous currency pair while the new one loads.
+  const rate = fetchedRate?.from === from && fetchedRate.to === to ? fetchedRate : undefined
   const value = parseMoney(amount, from) ?? 0
   const fee = Math.round(value * 0.015)
   const youGet = rate ? Math.floor(value * rate.rate) : 0
@@ -39,18 +50,11 @@ export default function ConvertPage() {
     setError('')
     setSubmitting(true)
     try {
-      // The client doesn't throw on 4xx/5xx, so check for an error body.
-      const res = (await convert({ from, to, amount: value })) as Partial<ApiErrorBody> & {
-        data?: Conversion
-      }
-      if (res.error) {
-        setError(res.error.message)
-      } else if (res.data) {
-        setResult(res.data)
-        setAmount('')
-      }
+      const res = await convert({ from, to, amount: value })
+      setResult(res.data)
+      setAmount('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.')
     } finally {
       setSubmitting(false)
     }

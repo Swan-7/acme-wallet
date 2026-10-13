@@ -10,24 +10,34 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    getMe()
+    const controller = new AbortController()
+    getMe({ signal: controller.signal })
       .then((res) => setUser(res.data))
-      .finally(() => setIsLoading(false))
+      .catch(() => {
+        // Handled below: `user` stays undefined.
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoading(false)
+      })
+    return () => controller.abort()
   }, [])
 
   if (isLoading) return <p className={styles.loading}>Loading…</p>
+  if (!user) {
+    return <p className={styles.loading}>We couldn&apos;t load your account. Please refresh to try again.</p>
+  }
 
   return (
     <div className={styles.page}>
       <header>
-        <h1 className={styles.title}>Welcome back, {user!.firstName}</h1>
+        <h1 className={styles.title}>Welcome back, {user.firstName}</h1>
         <p className={styles.subtitle}>Here&apos;s what&apos;s happening with your money today.</p>
       </header>
 
-      <BalanceSummary wallets={user!.wallets} />
+      <BalanceSummary wallets={user.wallets} />
 
       <div className={styles.wallets}>
-        {user!.wallets.map((wallet) => (
+        {user.wallets.map((wallet) => (
           <WalletCard key={wallet.currency} wallet={wallet} />
         ))}
       </div>
