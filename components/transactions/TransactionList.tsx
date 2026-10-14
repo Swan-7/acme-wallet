@@ -46,12 +46,12 @@ export function TransactionListSkeleton({ rows = 6 }: { rows?: number }) {
           <li key={i} className={styles.skeletonRow}>
             <Skeleton circle width={40} height={40} />
             <span className={styles.skeletonMain}>
-              <Skeleton width={110} height={12} />
-              <Skeleton width="min(240px, 100%)" height={10} />
+              <Skeleton width={120} height={12} />
+              <Skeleton width={260} height={10} />
             </span>
             <span className={styles.skeletonEnd}>
-              <Skeleton width={84} height={12} />
-              <Skeleton width={36} height={10} />
+              <Skeleton width={96} height={12} />
+              <Skeleton width={40} height={10} />
             </span>
           </li>
         ))}

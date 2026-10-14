@@ -2,6 +2,7 @@
 import type { KeyboardEvent } from 'react'
 import type { TransactionStatus, TransactionType } from '@/types/api'
 import { Button, Input, Select, type SelectOption } from '@/components/ui'
+import { cx } from '@/lib/cx'
 import { TRANSACTION_STATUS_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 import { SEARCH_MAX_LENGTH } from '@/lib/transactions/params'
 import styles from './TransactionFilters.module.css'
@@ -84,11 +85,12 @@ export function TransactionFilters({
         onChange={(event) => onStatusChange(event.target.value)}
         fieldClassName={styles.status}
       />
-      {showClear && (
-        <Button variant="ghost" onClick={onClear} className={styles.clear}>
+      {/* Always laid out so the search field keeps its width; inert (unfocusable, hidden from AT) while idle. */}
+      <div className={cx(styles.clear, !showClear && styles.clearIdle)} inert={!showClear}>
+        <Button variant="ghost" onClick={onClear}>
           Clear filters
         </Button>
-      )}
+      </div>
     </form>
   )
 }

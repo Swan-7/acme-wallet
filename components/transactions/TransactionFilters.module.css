@@ -4,6 +4,8 @@
   grid-template-areas: 'search type status clear';
   align-items: end;
   gap: var(--space-3);
+  /* Design offsets the fields 3.5px below the filter bar box. */
+  padding-top: 3.5px;
 }
 
 .search {
@@ -22,7 +24,16 @@
   grid-area: clear;
 }
 
+/* Keep the slot so the search field does not resize when "Clear filters" appears (as in the design). */
+.clearIdle {
+  visibility: hidden;
+}
+
 @media (max-width: 900px) {
+  .clearIdle {
+    display: none;
+  }
+
   .filters {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas:
@@ -33,5 +44,12 @@
 
   .clear {
     justify-self: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .filters {
+    padding-top: var(--space-2);
+    row-gap: var(--space-3);
   }
 }

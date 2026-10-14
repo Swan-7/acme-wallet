@@ -10,6 +10,8 @@ export interface EmptyStateProps {
   description?: string
   /** Typically a Button. */
   action?: ReactNode
+  /** "sm" trims the top padding for use inside a drawer. */
+  size?: 'md' | 'sm'
   /** Use "alert" for failures so assistive tech announces them. */
   role?: 'status' | 'alert'
   className?: string
@@ -22,10 +24,11 @@ export function EmptyState({
   description,
   action,
   role,
+  size = 'md',
   className,
 }: EmptyStateProps) {
   return (
-    <div className={cx(styles.root, className)} role={role}>
+    <div className={cx(styles.root, size === 'sm' && styles.sm, className)} role={role}>
       <span className={cx(styles.icon, styles[tone])}>
         <Icon name={icon} size={22} />
       </span>

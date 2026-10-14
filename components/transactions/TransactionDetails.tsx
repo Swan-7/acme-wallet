@@ -27,6 +27,7 @@ export function TransactionDetails({ id, initialData, onClose }: TransactionDeta
   if (query.error instanceof ApiError && query.error.status === 404) {
     return (
       <EmptyState
+        size="sm"
         icon="search"
         title="Transaction not found"
         description="It may have been removed, or the link is wrong."
@@ -41,6 +42,7 @@ export function TransactionDetails({ id, initialData, onClose }: TransactionDeta
 
   return (
     <EmptyState
+      size="sm"
       role="alert"
       icon="alert"
       tone="danger"
@@ -152,13 +154,13 @@ function DetailsSkeleton() {
         <Skeleton circle width={48} height={48} />
         <Skeleton width={160} height={12} />
         <Skeleton width={200} height={24} />
-        <Skeleton width={84} height={20} />
+        <Skeleton width={84} height={22} />
       </div>
       <div className={styles.skeletonRows}>
         {Array.from({ length: 4 }, (_, i) => (
           <div key={i} className={styles.row}>
             <Skeleton width={90} height={12} />
-            <Skeleton width={110} height={12} />
+            <Skeleton width={140} height={12} />
           </div>
         ))}
       </div>
