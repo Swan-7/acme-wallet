@@ -1,7 +1,7 @@
 import { formatDate, formatTime } from '@/lib/format'
 import { groupByDay } from './group'
 import { getInitials } from './initials'
-import { getPageItems } from './pagination'
+import { getPageItems } from '@/lib/pagination'
 import { applyTransactionParams, hasActiveFilters, parseTransactionParams, toApiQuery } from './params'
 
 describe('parseTransactionParams', () => {

@@ -1,0 +1,37 @@
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px 180px auto;
+  grid-template-areas: 'search type status clear';
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.search {
+  grid-area: search;
+}
+
+.type {
+  grid-area: type;
+}
+
+.status {
+  grid-area: status;
+}
+
+.clear {
+  grid-area: clear;
+}
+
+@media (max-width: 900px) {
+  .filters {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'search search'
+      'type status'
+      'clear clear';
+  }
+
+  .clear {
+    justify-self: start;
+  }
+}

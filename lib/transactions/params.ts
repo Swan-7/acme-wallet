@@ -23,8 +23,9 @@ const PAGE_PATTERN = /^[1-9]\d{0,5}$/
 const ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/
 
 // Object.hasOwn: a plain `in` check would accept "toString" and friends.
-const isType = (value: string): value is TransactionType => Object.hasOwn(TRANSACTION_TYPE_LABELS, value)
-const isStatus = (value: string): value is TransactionStatus =>
+export const isTransactionType = (value: string): value is TransactionType =>
+  Object.hasOwn(TRANSACTION_TYPE_LABELS, value)
+export const isTransactionStatus = (value: string): value is TransactionStatus =>
   Object.hasOwn(TRANSACTION_STATUS_LABELS, value)
 
 export function normaliseSearch(value: string): string {
@@ -47,8 +48,8 @@ export function parseTransactionParams(search: ReadableParams): TransactionParam
 
   return {
     q: normaliseSearch(search.get('q') ?? ''),
-    type: type !== null && isType(type) ? type : null,
-    status: status !== null && isStatus(status) ? status : null,
+    type: type !== null && isTransactionType(type) ? type : null,
+    status: status !== null && isTransactionStatus(status) ? status : null,
     page: page !== null && PAGE_PATTERN.test(page) ? Number(page) : 1,
     tx: tx !== null && ID_PATTERN.test(tx) ? tx : null,
   }
