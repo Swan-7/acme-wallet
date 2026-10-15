@@ -1,0 +1,58 @@
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--size-filter-type) var(--size-filter-status) auto;
+  grid-template-areas: 'search type status clear';
+  align-items: end;
+  gap: var(--space-3);
+  /* Design offsets the fields 3.5px below the filter bar box. */
+  padding-top: var(--space-field-offset);
+}
+
+.search {
+  grid-area: search;
+}
+
+.type {
+  grid-area: type;
+}
+
+.status {
+  grid-area: status;
+}
+
+.clear {
+  grid-area: clear;
+}
+
+/* Keep the slot so the search field does not resize when "Clear filters" appears (as in the design). */
+.clearIdle {
+  visibility: hidden;
+}
+
+@media (max-width: 900px) {
+  .clearIdle {
+    display: none;
+  }
+
+  .filters {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'search search'
+      'type status';
+  }
+
+  /* Auto-placed in its own row only when shown, so an idle Clear button reserves no space. */
+  .clear {
+    grid-area: auto;
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .filters {
+    padding-top: var(--space-2);
+    /* Design: 11.5px between the search field and the Type/Status row. */
+    row-gap: var(--space-filter-rows);
+  }
+}

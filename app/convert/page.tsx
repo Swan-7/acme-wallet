@@ -1,13 +1,27 @@
 'use client'
-import { useEffect, useState } from 'react'
-import type { ApiErrorBody, Conversion, Currency, Rate, User } from '@/types/api'
-import { CURRENCIES } from '@/types/api'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRef, useState } from 'react'
+import type { Conversion, Currency } from '@/types/api'
+import { CURRENCIES, isCurrency } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
-import { convert, getMe, getRate } from '@/lib/api/endpoints'
+import { ApiError } from '@/lib/api/client'
+import { convert } from '@/lib/api/endpoints'
 import { parseMoney } from '@/lib/format'
+import { convertMinorFloor, portionOfMinor } from '@/lib/rates/convert'
+import { useRateQuery } from '@/lib/rates/queries'
+import { useMeQuery } from '@/lib/user/queries'
 import styles from './page.module.css'
 
+/** Conversion fee: 1.5% (API.md). */
+const FEE_NUMERATOR = 15
+const FEE_DENOMINATOR = 1000
+
 const CURRENCY_OPTIONS = CURRENCIES.map((c) => ({ value: c, label: c }))
+
+/** crypto.randomUUID needs a secure context; fall back for plain-http LAN testing. */
+function newIdempotencyKey(): string {
+  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
 
 export default function ConvertPage() {
   const [from, setFrom] = useState<Currency>('USD')
@@ -17,41 +31,55 @@ export default function ConvertPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  const [user, setUser] = useState<User>()
-  const [rate, setRate] = useState<Rate>()
+  const queryClient = useQueryClient()
+  const user = useMeQuery().data
+  // Keyed by the pair, so a rate for a previous pair is never shown while the new one loads.
+  const rate = useRateQuery(from, to).data
 
-  useEffect(() => {
-    getMe().then((res) => setUser(res.data))
-  }, [])
-
-  useEffect(() => {
-    getRate(from, to).then((res) => setRate(res.data))
-  }, [from, to])
-
+  // Single-flight lock (state updates are async, so a fast double-tap could otherwise submit twice) and
+  // the idempotency key for the current intent. The key is kept across an unconfirmed outcome so a manual
+  // retry of the same conversion is recognisable as the same request.
+  const inFlight = useRef(false)
+  const attempt = useRef<{ signature: string; key: string } | null>(null)
   const value = parseMoney(amount, from) ?? 0
-  const fee = Math.round(value * 0.015)
-  const youGet = rate ? Math.floor(value * rate.rate) : 0
+  // Mirrors the server (1.5% fee; you receive floor(amount x rate)) using exact integer math.
+  const fee = portionOfMinor(value, FEE_NUMERATOR, FEE_DENOMINATOR)
+  const youGet = rate ? convertMinorFloor(value, rate.rate) : 0
   const wallet = user?.wallets.find((w) => w.currency === from)
   const canSubmit = value > 0 && from !== to && !submitting
 
   const handleConvert = async () => {
-    if (!canSubmit) return
+    if (!canSubmit || inFlight.current) return
+    inFlight.current = true
     setError('')
     setSubmitting(true)
+
+    const signature = `${from}:${to}:${value}`
+    if (attempt.current?.signature !== signature) attempt.current = { signature, key: newIdempotencyKey() }
+    const key = attempt.current.key
+
     try {
-      // The client doesn't throw on 4xx/5xx, so check for an error body.
-      const res = (await convert({ from, to, amount: value })) as Partial<ApiErrorBody> & {
-        data?: Conversion
-      }
-      if (res.error) {
-        setError(res.error.message)
-      } else if (res.data) {
-        setResult(res.data)
-        setAmount('')
-      }
+      const res = await convert({ from, to, amount: value }, { headers: { 'Idempotency-Key': key } })
+      attempt.current = null
+      setResult(res.data)
+      setAmount('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      if (err instanceof ApiError && !err.isRetryable) {
+        // The server definitively refused it (validation, insufficient funds): a fresh intent next time.
+        attempt.current = null
+        setError(err.message)
+      } else {
+        // Network drop or 5xx: we do not know whether the conversion was applied. Say so, and reconcile
+        // against the server rather than claiming success or failure.
+        setError(
+          'We couldn’t confirm whether this conversion went through. Check your transactions before trying again.'
+        )
+      }
     } finally {
+      // Whatever happened, balances and history may have changed: refresh them from the server.
+      void queryClient.invalidateQueries({ queryKey: ['me'] })
+      void queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      inFlight.current = false
       setSubmitting(false)
     }
   }
@@ -66,7 +94,7 @@ export default function ConvertPage() {
             label="From"
             options={CURRENCY_OPTIONS}
             value={from}
-            onChange={(e) => setFrom(e.target.value as Currency)}
+            onChange={(value) => isCurrency(value) && setFrom(value)}
             fieldClassName={styles.currency}
           />
           <Input
@@ -93,7 +121,7 @@ export default function ConvertPage() {
           label="To"
           options={CURRENCY_OPTIONS}
           value={to}
-          onChange={(e) => setTo(e.target.value as Currency)}
+          onChange={(value) => isCurrency(value) && setTo(value)}
           fieldClassName={styles.to}
         />
 

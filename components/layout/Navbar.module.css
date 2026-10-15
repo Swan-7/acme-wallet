@@ -20,7 +20,7 @@
   font-size: var(--text-xl);
   font-weight: var(--weight-heavy);
   color: var(--color-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-tight);
 }
 
 .logoDot {
@@ -48,12 +48,43 @@
   font-weight: var(--weight-semibold);
 }
 
+/* Narrow screens: 64px logo/account row, then a 44px tab row with a 2px active underline (109px total). */
 @media (max-width: 640px) {
-  .links {
-    display: none;
+  .inner {
+    flex-wrap: wrap;
+    gap: 0;
+    height: auto;
   }
 
-  .inner {
-    justify-content: space-between;
+  .logo {
+    display: flex;
+    align-items: center;
+    height: var(--navbar-height);
+  }
+
+  .links {
+    order: 3;
+    flex: none;
+    width: 100%;
+    gap: var(--space-6);
+  }
+
+  .link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: var(--size-tab);
+    white-space: nowrap;
+  }
+
+  /* Overlaps the header's own bottom border, as in the design (underline at y = 43..45). */
+  .active::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: calc(var(--border-width-active) / -2);
+    left: 0;
+    height: var(--border-width-active);
+    background: var(--color-primary);
   }
 }

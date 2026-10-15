@@ -8,23 +8,10 @@
   color: var(--color-primary);
 }
 
-.message {
-  padding: var(--space-6);
-  font-size: var(--text-md);
-  color: var(--color-text-muted);
+.list {
+  list-style: none;
 }
 
-.details {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-3) var(--space-6);
-  font-size: var(--text-md);
-}
-
-.details dt {
-  color: var(--color-text-muted);
-}
-
-.details dd {
-  text-align: right;
+.item + .item {
+  border-top: 1px solid var(--color-border);
 }

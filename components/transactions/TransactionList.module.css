@@ -1,0 +1,53 @@
+.card {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+/* Previous results stay visible while the next ones load; dim them so the change is perceptible. */
+.card[data-refreshing] {
+  opacity: 0.6;
+}
+
+.groupTitle {
+  padding: var(--space-3) var(--space-6) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-subtle);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.group + .group .groupTitle {
+  border-top: 1px solid var(--color-border);
+}
+
+.items {
+  list-style: none;
+}
+
+.item + .item {
+  border-top: 1px solid var(--color-border);
+}
+
+/* Design: the loading card has 4px of top padding above the day header. */
+.skeletonCard {
+  padding-top: var(--space-1);
+}
+
+@media (max-width: 640px) {
+  .groupTitle {
+    padding-inline: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import { cx } from '@/lib/cx'
 import { Icon, type IconName } from '../Icon'
 import styles from './Button.module.css'
@@ -11,9 +11,12 @@ export interface ButtonProps {
   iconRight?: IconName
   fullWidth?: boolean
   disabled?: boolean
-  onClick?: () => void
+  /** Defaults to "button" so a Button inside a <form> never submits by accident. */
+  type?: 'button' | 'submit' | 'reset'
+  onClick?: MouseEventHandler<HTMLButtonElement>
   className?: string
   'aria-label'?: string
+  'aria-busy'?: boolean
 }
 
 export function Button({
@@ -24,26 +27,22 @@ export function Button({
   iconRight,
   fullWidth,
   disabled,
+  type = 'button',
   onClick,
   className,
   ...rest
 }: ButtonProps) {
   return (
-    <div
-      className={cx(
-        styles.button,
-        styles[variant],
-        styles[size],
-        fullWidth && styles.fullWidth,
-        disabled && styles.disabled,
-        className
-      )}
-      onClick={disabled ? undefined : onClick}
+    <button
+      type={type}
+      className={cx(styles.button, styles[variant], styles[size], fullWidth && styles.fullWidth, className)}
+      disabled={disabled}
+      onClick={onClick}
       {...rest}
     >
       {iconLeft && <Icon name={iconLeft} size={16} />}
       {children}
       {iconRight && <Icon name={iconRight} size={16} />}
-    </div>
+    </button>
   )
 }

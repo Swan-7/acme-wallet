@@ -45,6 +45,51 @@
   --space-10: 40px;
   --space-12: 48px;
 
+  /* Spacing between grid steps (design variables "item spacing/…", named px / 4) */
+  --space-1_5: 6px;
+  --space-2_5: 10px;
+  --space-3_5: 14px;
+
+  /* Spacing taken verbatim from the design where it is not on a grid */
+  --space-field-offset: 3.5px; /* filter fields sit this far below the bar box */
+  --space-row-inset: 13.5px; /* row padding in loading skeleton rows */
+  --space-meta-gap: 5.5px; /* amount -> time in a transaction row */
+  --space-filter-rows: 11.5px; /* search -> type/status on mobile */
+  --space-state-title: 15px; /* state icon -> title */
+  --space-state-action: 16.5px; /* state description -> action */
+  --space-step-inset: 13px; /* pagination Previous/Next horizontal padding */
+
+  /* Component dimensions (from the design file) */
+  --size-avatar-sm: 36px;
+  --size-avatar: 40px;
+  --size-avatar-lg: 48px;
+  --size-control: 40px;
+  --size-control-sm: 32px;
+  --size-icon-button: 32px;
+  --size-copy-button: 28px;
+  --size-page-button: 36px;
+  --size-page-gap: 28px;
+  --size-row: 68px;
+  --size-tab: 44px;
+  --size-wallet-card: 132px;
+  --size-state-icon: 48px;
+  --size-state-text: 360px;
+  --size-grabber-width: 36px;
+  --size-grabber-height: 4px;
+  --size-listbox-max: 320px;
+  --size-filter-type: 200px;
+  --size-filter-status: 180px;
+  --size-col-status: 112px;
+  --size-col-amount: 176px;
+  --border-width-active: 2px;
+  --line-label: 20px;
+  --focus-ring: 0 0 0 3px var(--color-primary-soft);
+
+  /* Letter spacing */
+  --tracking-title: -0.01em;
+  --tracking-tight: -0.02em;
+  --tracking-caps: 0.04em; /* uppercase 12px labels: 0.48px */
+
   /* Radius */
   --radius-sm: 6px;
   --radius-md: 8px;

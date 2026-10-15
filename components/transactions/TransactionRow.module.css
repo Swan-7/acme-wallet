@@ -1,38 +1,35 @@
 .row {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  grid-template-columns: var(--size-avatar) minmax(0, 1fr) var(--size-col-status) var(--size-col-amount);
+  grid-template-areas:
+    'avatar main status amount'
+    'avatar main status meta';
   align-items: center;
-  gap: var(--space-4);
+  column-gap: var(--space-4);
   width: 100%;
-  min-height: 68px;
+  min-height: var(--size-row);
   padding: var(--space-3) var(--space-6);
   border: 0;
-  border-bottom: 1px solid var(--color-border);
   background: none;
   text-align: left;
   cursor: pointer;
-}
-
-.row:last-child {
-  border-bottom: 0;
 }
 
 .row:hover {
   background: var(--color-bg-subtle);
 }
 
-.icon {
+.row:focus-visible {
+  outline-offset: calc(var(--border-width-active) * -1);
+}
+
+.avatar {
+  grid-area: avatar;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
 }
 
 .main {
+  grid-area: main;
   min-width: 0;
 }
 
@@ -53,13 +50,14 @@
   white-space: nowrap;
 }
 
-.end {
-  display: block;
-  text-align: right;
+.status {
+  grid-area: status;
+  justify-self: start;
 }
 
-.amount,
-.credit {
+.amount {
+  grid-area: amount;
+  justify-self: end;
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
 }
@@ -69,9 +67,36 @@
 }
 
 .meta {
-  display: block;
-  margin-top: var(--space-1);
+  grid-area: meta;
+  justify-self: end;
+  margin-top: var(--space-meta-gap);
   font-size: var(--text-xs);
   color: var(--color-text-subtle);
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: var(--size-avatar-sm) minmax(0, 1fr) auto;
+    grid-template-areas:
+      'avatar main amount'
+      'avatar main status';
+    column-gap: var(--space-3);
+    row-gap: var(--space-1_5);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .avatar > * {
+    width: var(--size-avatar-sm);
+    height: var(--size-avatar-sm);
+  }
+
+  .status {
+    justify-self: end;
+  }
+
+  .metaHiddenOnMobile {
+    display: none;
+  }
 }

@@ -17,12 +17,12 @@
 }
 
 .md {
-  height: 40px;
+  height: var(--size-control);
   padding: 0 var(--space-4);
 }
 
 .sm {
-  height: 32px;
+  height: var(--size-control-sm);
   padding: 0 var(--space-3);
   font-size: var(--text-sm);
 }
@@ -59,7 +59,7 @@
   width: 100%;
 }
 
-.disabled {
+.button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }

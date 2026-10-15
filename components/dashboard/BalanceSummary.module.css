@@ -14,5 +14,31 @@
   margin-top: var(--space-1);
   font-size: var(--text-3xl);
   font-weight: var(--weight-heavy);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-tight);
+}
+
+.totalSkeleton {
+  margin-top: var(--space-1);
+}
+
+.noteSkeleton {
+  margin-top: var(--space-2);
+}
+
+/* Secondary helper line: this is an estimate, not a ledger balance. Muted (6.2:1 on white) rather than
+   subtle (3.4:1), so it stays small and quiet but still meets AA. */
+.note {
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.retry {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  cursor: pointer;
 }

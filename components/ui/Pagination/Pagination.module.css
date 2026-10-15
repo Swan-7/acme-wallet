@@ -1,0 +1,106 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  list-style: none;
+}
+
+.step,
+.page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: var(--size-page-button);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.step {
+  height: var(--size-control-sm);
+  gap: var(--space-2);
+  margin-inline: var(--space-1);
+  padding: 0 var(--space-step-inset);
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+}
+
+.step:hover:not(:disabled) {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-border-strong);
+}
+
+.step:disabled {
+  color: var(--color-text-subtle);
+  cursor: not-allowed;
+}
+
+.page {
+  min-width: var(--size-page-button);
+  padding: 0 var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.page:hover {
+  background: var(--color-primary-soft);
+}
+
+.current,
+.current:hover {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--weight-semibold);
+  cursor: default;
+}
+
+.ellipsis {
+  min-width: var(--size-page-gap);
+  text-align: center;
+  color: var(--color-text-subtle);
+}
+
+.summary,
+.stepLabelShort {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .root {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .pages,
+  .stepLabel {
+    display: none;
+  }
+
+  .stepLabelShort {
+    display: inline;
+  }
+
+  /* The 4px outer margin is a desktop detail; on mobile the buttons sit flush with the card edges. */
+  .step {
+    margin-inline: 0;
+  }
+
+  .summary {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+}

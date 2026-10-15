@@ -1,12 +1,13 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-1_5);
   min-width: 0;
 }
 
 .label {
   font-size: var(--text-sm);
+  line-height: var(--line-label);
   font-weight: var(--weight-medium);
   color: var(--color-text-muted);
 }
