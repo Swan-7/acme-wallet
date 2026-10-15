@@ -1,7 +1,7 @@
 'use client'
 import type { KeyboardEvent } from 'react'
 import type { TransactionStatus, TransactionType } from '@/types/api'
-import { Button, Input, Select, type SelectOption } from '@/components/ui'
+import { Button, Dropdown, Input, type DropdownOption } from '@/components/ui'
 import { cx } from '@/lib/cx'
 import { TRANSACTION_STATUS_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 import { SEARCH_MAX_LENGTH } from '@/lib/transactions/params'
@@ -10,12 +10,12 @@ import { useMediaQuery } from './useMediaQuery'
 
 const ALL = ''
 
-const TYPE_OPTIONS: SelectOption[] = [
+const TYPE_OPTIONS: DropdownOption[] = [
   { value: ALL, label: 'All types' },
   ...Object.entries(TRANSACTION_TYPE_LABELS).map(([value, label]) => ({ value, label })),
 ]
 
-const STATUS_OPTIONS: SelectOption[] = [
+const STATUS_OPTIONS: DropdownOption[] = [
   { value: ALL, label: 'All statuses' },
   ...Object.entries(TRANSACTION_STATUS_LABELS).map(([value, label]) => ({ value, label })),
 ]
@@ -71,18 +71,18 @@ export function TransactionFilters({
         enterKeyHint="search"
         fieldClassName={styles.search}
       />
-      <Select
+      <Dropdown
         label="Type"
         options={TYPE_OPTIONS}
         value={type ?? ALL}
-        onChange={(event) => onTypeChange(event.target.value)}
+        onChange={onTypeChange}
         fieldClassName={styles.type}
       />
-      <Select
+      <Dropdown
         label="Status"
         options={STATUS_OPTIONS}
         value={status ?? ALL}
-        onChange={(event) => onStatusChange(event.target.value)}
+        onChange={onStatusChange}
         fieldClassName={styles.status}
       />
       {/* Always laid out so the search field keeps its width; inert (unfocusable, hidden from AT) while idle. */}

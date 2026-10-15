@@ -79,17 +79,19 @@ describe('TransactionsView filters', () => {
   it('changing the type select requests filtered data', async () => {
     renderView()
     await screen.findByText('Card payment - Netflix')
-    await userEvent.selectOptions(screen.getByLabelText('Type'), 'deposit')
+    await userEvent.click(screen.getByRole('combobox', { name: 'Type' }))
+    await userEvent.click(screen.getByRole('option', { name: 'Deposit' }))
     await waitFor(() => expect(requests.some((u) => u.includes('type=deposit'))).toBe(true))
-    expect(screen.getByLabelText('Type')).toHaveValue('deposit')
+    expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('Deposit')
   })
 
   it('changing the status select requests filtered data', async () => {
     renderView()
     await screen.findByText('Card payment - Netflix')
-    await userEvent.selectOptions(screen.getByLabelText('Status'), 'failed')
+    await userEvent.click(screen.getByRole('combobox', { name: 'Status' }))
+    await userEvent.click(screen.getByRole('option', { name: 'Failed' }))
     await waitFor(() => expect(requests.some((u) => u.includes('status=failed'))).toBe(true))
-    expect(screen.getByLabelText('Status')).toHaveValue('failed')
+    expect(screen.getByRole('combobox', { name: 'Status' })).toHaveTextContent('Failed')
   })
 
   it('typing in search shows the text and requests q after the debounce', async () => {
@@ -107,7 +109,7 @@ describe('TransactionsView filters', () => {
     await screen.findByText('Card payment - Netflix')
     const clear = screen.getByRole('button', { name: 'Clear filters' })
     await userEvent.click(clear)
-    await waitFor(() => expect(screen.getByLabelText('Type')).toHaveValue(''))
+    await waitFor(() => expect(screen.getByRole('combobox', { name: 'Type' })).toHaveTextContent('All types'))
     expect(screen.getByLabelText('Search')).toHaveValue('')
   })
 
