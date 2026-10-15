@@ -3,7 +3,6 @@ import type { Transaction } from '@/types/api'
 import { Money } from '@/components/ui'
 import { cx } from '@/lib/cx'
 import { formatDateTime, formatTime, isCreditType, TRANSACTION_TYPE_LABELS } from '@/lib/format'
-import { displayText } from '@/lib/transactions/text'
 import { StatusBadge } from './StatusBadge'
 import { TransactionAvatar } from './TransactionAvatar'
 import styles from './TransactionRow.module.css'
@@ -32,8 +31,8 @@ export const TransactionRow = memo(function TransactionRow({
       </span>
       <span className={styles.main}>
         <span className={styles.title}>{TRANSACTION_TYPE_LABELS[tx.type]}</span>
-        {/* Narration is untrusted upstream text: always rendered as text, never as HTML. */}
-        <span className={styles.narration}>{displayText(tx.narration)}</span>
+        {/* Untrusted upstream text: shown exactly as received, always as text and never as HTML. */}
+        <span className={styles.narration}>{tx.narration}</span>
       </span>
       <StatusBadge status={tx.status} className={styles.status} />
       <Money

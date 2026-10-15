@@ -6,7 +6,6 @@ import { ApiError } from '@/lib/api/client'
 import { cx } from '@/lib/cx'
 import { formatDateTime, formatMoney, isCreditType, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 import { useTransactionQuery } from '@/lib/transactions/queries'
-import { displayText } from '@/lib/transactions/text'
 import { transactionTotal } from '@/lib/transactions/total'
 import { StatusBadge } from './StatusBadge'
 import { TransactionAvatar } from './TransactionAvatar'
@@ -68,7 +67,7 @@ function Loaded({ transaction: tx }: { transaction: Transaction }) {
     <div className={styles.root}>
       <section className={styles.hero} aria-label="Summary">
         <TransactionAvatar transaction={tx} size="lg" />
-        <p className={styles.narration}>{displayText(tx.narration)}</p>
+        <p className={styles.narration}>{tx.narration}</p>
         <p className={styles.amount}>
           <Money amount={tx.amount} currency={tx.currency} sign={isCredit ? 'credit' : 'debit'} />
         </p>
@@ -89,8 +88,8 @@ function Loaded({ transaction: tx }: { transaction: Transaction }) {
           </div>
           <Row label="Date">{formatDateTime(tx.createdAt)}</Row>
           <Row label="Type">{TRANSACTION_TYPE_LABELS[tx.type]}</Row>
-          {tx.counterparty && <Row label="Counterparty">{displayText(tx.counterparty)}</Row>}
-          <Row label="Narration">{displayText(tx.narration)}</Row>
+          {tx.counterparty && <Row label="Counterparty">{tx.counterparty}</Row>}
+          <Row label="Narration">{tx.narration}</Row>
         </dl>
       </section>
 

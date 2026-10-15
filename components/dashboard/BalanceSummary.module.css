@@ -25,11 +25,12 @@
   margin-top: var(--space-2);
 }
 
-/* Faint helper line: this is an estimate, not a ledger balance. */
+/* Secondary helper line: this is an estimate, not a ledger balance. Muted (6.2:1 on white) rather than
+   subtle (3.4:1), so it stays small and quiet but still meets AA. */
 .note {
   margin-top: var(--space-1);
   font-size: var(--text-xs);
-  color: var(--color-text-subtle);
+  color: var(--color-text-muted);
 }
 
 .retry {

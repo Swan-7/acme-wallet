@@ -61,7 +61,7 @@ describe('TransactionsView filters', () => {
     expect(screen.getByText('1 transaction')).toBeInTheDocument()
   })
 
-  it('never renders upstream narration as HTML and hides markup noise', async () => {
+  it('shows upstream narration exactly as received, as text and never as HTML', async () => {
     vi.mocked(fetch).mockImplementationOnce(
       async () =>
         new Response(
@@ -72,8 +72,12 @@ describe('TransactionsView filters', () => {
         )
     )
     const { container } = renderView()
-    expect(await screen.findByText('Bill payment - Spectranet')).toBeInTheDocument()
+    // The provider's markup-looking text is displayed verbatim, but never becomes an element.
+    expect(
+      await screen.findByText('Bill payment - Spectranet <img src=x onerror="window.__pwned=1">')
+    ).toBeInTheDocument()
     expect(container.querySelector('img')).toBeNull()
+    expect((window as unknown as { __pwned?: number }).__pwned).toBeUndefined()
   })
 
   it('changing the type select requests filtered data', async () => {

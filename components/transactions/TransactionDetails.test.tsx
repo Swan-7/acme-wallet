@@ -45,10 +45,10 @@ describe('TransactionDetails summary', () => {
     expect(screen.queryByText('Counterparty')).not.toBeInTheDocument()
   })
 
-  it('does not render hostile markup', () => {
+  it('shows hostile markup verbatim as text, never as an element', () => {
     const { container } = renderDetails(tx({ narration: 'Pay <img src=x onerror="alert(1)"> now' }))
     expect(container.querySelector('img')).toBeNull()
-    expect(screen.getAllByText('Pay now').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Pay <img src=x onerror="alert(1)"> now').length).toBeGreaterThan(0)
   })
 })
 

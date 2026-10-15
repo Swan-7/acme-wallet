@@ -1,4 +1,7 @@
-/* Static placeholder: the design specifies a flat #ECECF3 fill with no animation. */
+/*
+ * Flat #ECECF3 fill from the design's loading frames. The frames are static, so the pulse below is an
+ * addition: a subtle opacity change, switched off for people who ask for reduced motion.
+ */
 .skeleton {
   display: block;
   max-width: 100%;
@@ -9,4 +12,16 @@
 .circle {
   flex: none;
   border-radius: var(--radius-full);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
 }
