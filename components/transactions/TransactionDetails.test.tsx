@@ -31,13 +31,13 @@ describe('TransactionDetails summary', () => {
     expect(screen.getByText('Total')).toBeInTheDocument()
   })
 
-  it('omits the total of a conversion, which cannot be stated truthfully from one row', () => {
+  it('shows the total of a conversion: its fee is already in the row currency', () => {
+    // From the mock: a USD->NGN conversion row is NGN, with the fee converted at the same rate.
     renderDetails(
-      tx({ type: 'conversion', currency: 'NGN', amount: 3_058_969, fee: 4_590, counterparty: null })
+      tx({ type: 'conversion', currency: 'NGN', amount: 3_060_500, fee: 45_908, counterparty: null })
     )
-    expect(screen.queryByText('Total')).not.toBeInTheDocument()
-    expect(screen.getByText('Amount')).toBeInTheDocument()
-    expect(screen.getByText('Fee')).toBeInTheDocument()
+    expect(screen.getByText('Total')).toBeInTheDocument()
+    expect(screen.getByText('₦31,064.08')).toBeInTheDocument()
   })
 
   it('omits the counterparty row when there is none', () => {

@@ -62,7 +62,6 @@ export function TransactionDetails({ id, initialData, onClose }: TransactionDeta
 
 function Loaded({ transaction: tx }: { transaction: Transaction }) {
   const isCredit = isCreditType(tx.type)
-  // null when the record cannot state a truthful total (see transactionTotal).
   const total = transactionTotal(tx)
 
   return (
@@ -102,12 +101,10 @@ function Loaded({ transaction: tx }: { transaction: Transaction }) {
         <dl className={styles.list}>
           <Row label="Amount">{formatMoney(tx.amount, tx.currency)}</Row>
           <Row label="Fee">{formatMoney(tx.fee, tx.currency)}</Row>
-          {total !== null && (
-            <div className={styles.total}>
-              <dt>Total</dt>
-              <dd>{formatMoney(total, tx.currency)}</dd>
-            </div>
-          )}
+          <div className={styles.total}>
+            <dt>Total</dt>
+            <dd>{formatMoney(total, tx.currency)}</dd>
+          </div>
         </dl>
       </section>
     </div>

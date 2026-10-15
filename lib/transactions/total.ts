@@ -1,17 +1,13 @@
 import type { Transaction } from '@/types/api'
-import { isCreditType } from '@/lib/format'
 
 /**
- * The "Total" line of the details summary, or null when it cannot be stated truthfully from this record.
+ * The "Total" line of the details summary: amount + fee.
  *
- * - Debits (withdrawal, transfer out, card, bill): amount + fee. API.md: the fee is charged on top.
- * - Credits without a fee: the amount.
- * - Conversions: the history row is in the *target* currency (amount = received) while the fee was
- *   charged in the *source* currency, so adding them would produce a number that never moved anywhere.
- * - Credits that carry a fee: not specified by the API, so we do not guess.
+ * API.md: `fee` is charged on top of `amount`, in the transaction's own `currency`, so both are always
+ * in the same currency and the sum is well defined for every type. That includes conversions: the
+ * history row is recorded in the target currency with its fee already converted at the conversion rate,
+ * so the total is the value of what was paid, expressed in that currency.
  */
-export function transactionTotal(tx: Pick<Transaction, 'type' | 'amount' | 'fee'>): number | null {
-  if (tx.type === 'conversion') return null
-  if (isCreditType(tx.type)) return tx.fee === 0 ? tx.amount : null
+export function transactionTotal(tx: Pick<Transaction, 'amount' | 'fee'>): number {
   return tx.amount + tx.fee
 }

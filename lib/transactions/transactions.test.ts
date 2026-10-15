@@ -215,17 +215,13 @@ describe('displayText', () => {
 })
 
 describe('transactionTotal', () => {
-  it('is amount + fee for debits', () => {
-    expect(transactionTotal({ type: 'transfer_out', amount: 120_000, fee: 1_200 })).toBe(121_200)
-    expect(transactionTotal({ type: 'card_payment', amount: 4_599, fee: 0 })).toBe(4_599)
+  it('is amount + fee, both in the transaction currency (API.md)', () => {
+    expect(transactionTotal({ amount: 120_000, fee: 1_200 })).toBe(121_200)
+    expect(transactionTotal({ amount: 4_599, fee: 0 })).toBe(4_599)
   })
 
-  it('is the amount for fee-free credits', () => {
-    expect(transactionTotal({ type: 'deposit', amount: 50_000_000, fee: 0 })).toBe(50_000_000)
-  })
-
-  it('refuses to invent a total for conversions and for credits that carry a fee', () => {
-    expect(transactionTotal({ type: 'conversion', amount: 3_058_969, fee: 4_590 })).toBeNull()
-    expect(transactionTotal({ type: 'transfer_in', amount: 10_000, fee: 100 })).toBeNull()
+  it('holds for a conversion row, whose fee the backend already converted to the row currency', () => {
+    // txn_cnv1 from the mock:  .00 + 1.5% at 1530.25 -> NGN 30,605.00 received, fee NGN 459.08
+    expect(transactionTotal({ amount: 3_060_500, fee: 45_908 })).toBe(3_106_408)
   })
 })
