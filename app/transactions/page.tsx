@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
-import { TransactionsFallback } from '@/components/transactions/TransactionsFallback'
-import { TransactionsView } from '@/components/transactions/TransactionsView'
+import { TransactionsFallback, TransactionsView } from '@/components/transactions'
 
 export const metadata: Metadata = { title: 'Transactions' }
 

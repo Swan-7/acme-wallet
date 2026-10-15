@@ -2,7 +2,12 @@
 import { useCallback, useEffect, useRef } from 'react'
 import type { Transaction } from '@/types/api'
 import { Button, Drawer, EmptyState, Pagination } from '@/components/ui'
-import { hasActiveFilters, PAGE_SIZE } from '@/lib/transactions/params'
+import {
+  hasActiveFilters,
+  isTransactionStatus,
+  isTransactionType,
+  PAGE_SIZE,
+} from '@/lib/transactions/params'
 import { useTransactionsQuery } from '@/lib/transactions/queries'
 import { TransactionDetails } from './TransactionDetails'
 import { TransactionFilters } from './TransactionFilters'
@@ -77,9 +82,9 @@ export function TransactionsView() {
         onSearchTextChange={search.onChange}
         onSearchSubmit={search.commitNow}
         type={params.type}
-        onTypeChange={(value) => navigate({ type: (value || null) as typeof params.type })}
+        onTypeChange={(value) => navigate({ type: isTransactionType(value) ? value : null })}
         status={params.status}
-        onStatusChange={(value) => navigate({ status: (value || null) as typeof params.status })}
+        onStatusChange={(value) => navigate({ status: isTransactionStatus(value) ? value : null })}
         showClear={filtered || search.text.trim() !== ''}
         onClear={clearFilters}
       />
