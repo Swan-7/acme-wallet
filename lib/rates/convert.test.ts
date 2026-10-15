@@ -1,4 +1,28 @@
-import { convertMinor, totalInBase } from './convert'
+import { convertMinor, convertMinorFloor, portionOfMinor, totalInBase } from './convert'
+
+describe('convertMinorFloor / portionOfMinor (parity with the convert endpoint)', () => {
+  it('floors what you receive', () => {
+    expect(convertMinorFloor(1999, 1530.25)).toBe(3_058_969) // API.md example
+    expect(convertMinorFloor(1, 0.5)).toBe(0)
+  })
+
+  it('charges 1.5% rounded half up', () => {
+    expect(portionOfMinor(1999, 15, 1000)).toBe(30) // API.md example: fee 30
+    expect(portionOfMinor(100, 15, 1000)).toBe(2) // 1.5 -> 2
+    expect(portionOfMinor(0, 15, 1000)).toBe(0)
+  })
+
+  it('matches the endpoint formulas Math.floor(a * r) and Math.round(a * 0.015) across a wide range', () => {
+    for (const rate of [1530.25, 98.4, 0.000653, 0.0102, 0.653456]) {
+      for (let amount = 1; amount <= 20_000; amount += 7) {
+        expect(convertMinorFloor(amount, rate)).toBe(Math.floor(amount * rate))
+      }
+    }
+    for (let amount = 1; amount <= 50_000; amount++) {
+      expect(portionOfMinor(amount, 15, 1000)).toBe(Math.round(amount * 0.015))
+    }
+  })
+})
 
 describe('convertMinor', () => {
   it('converts exactly', () => {

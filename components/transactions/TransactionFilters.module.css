@@ -1,11 +1,11 @@
 .filters {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 200px 180px auto;
+  grid-template-columns: minmax(0, 1fr) var(--size-filter-type) var(--size-filter-status) auto;
   grid-template-areas: 'search type status clear';
   align-items: end;
   gap: var(--space-3);
   /* Design offsets the fields 3.5px below the filter bar box. */
-  padding-top: 3.5px;
+  padding-top: var(--space-field-offset);
 }
 
 .search {
@@ -53,6 +53,6 @@
   .filters {
     padding-top: var(--space-2);
     /* Design: 11.5px between the search field and the Type/Status row. */
-    row-gap: 11.5px;
+    row-gap: var(--space-filter-rows);
   }
 }

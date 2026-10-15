@@ -14,8 +14,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: var(--size-state-icon);
+  height: var(--size-state-icon);
   border-radius: var(--radius-full);
 }
 
@@ -30,18 +30,18 @@
 }
 
 .title {
-  margin-top: 15px;
+  margin-top: var(--space-state-title);
   font-size: var(--text-base);
   font-weight: var(--weight-semibold);
 }
 
 .description {
-  max-width: 360px;
+  max-width: var(--size-state-text);
   margin-top: var(--space-1);
   font-size: var(--text-md);
   color: var(--color-text-muted);
 }
 
 .action {
-  margin-top: 16.5px;
+  margin-top: var(--space-state-action);
 }

@@ -7,17 +7,16 @@
   background: var(--color-primary-soft);
   color: var(--color-primary);
   font-weight: var(--weight-semibold);
-  letter-spacing: 0.02em;
 }
 
 .md {
-  width: 40px;
-  height: 40px;
+  width: var(--size-avatar);
+  height: var(--size-avatar);
   font-size: var(--text-sm);
 }
 
 .lg {
-  width: 48px;
-  height: 48px;
+  width: var(--size-avatar-lg);
+  height: var(--size-avatar-lg);
   font-size: var(--text-md);
 }

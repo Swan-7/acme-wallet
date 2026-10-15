@@ -18,7 +18,7 @@ describe('Field wiring', () => {
   })
 
   it('associates the label with the select', () => {
-    render(<Select label="Type" options={[{ value: 'a', label: 'A' }]} />)
+    render(<Select label="Type" value="a" onChange={() => {}} options={[{ value: 'a', label: 'A' }]} />)
     expect(screen.getByLabelText('Type')).toBeInTheDocument()
   })
 })

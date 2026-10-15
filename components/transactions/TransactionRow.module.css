@@ -1,13 +1,13 @@
 .row {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 112px 176px;
+  grid-template-columns: var(--size-avatar) minmax(0, 1fr) var(--size-col-status) var(--size-col-amount);
   grid-template-areas:
     'avatar main status amount'
     'avatar main status meta';
   align-items: center;
   column-gap: var(--space-4);
   width: 100%;
-  min-height: 68px;
+  min-height: var(--size-row);
   padding: var(--space-3) var(--space-6);
   border: 0;
   background: none;
@@ -20,7 +20,7 @@
 }
 
 .row:focus-visible {
-  outline-offset: -2px;
+  outline-offset: calc(var(--border-width-active) * -1);
 }
 
 .avatar {
@@ -69,7 +69,7 @@
 .meta {
   grid-area: meta;
   justify-self: end;
-  margin-top: 5.5px;
+  margin-top: var(--space-meta-gap);
   font-size: var(--text-xs);
   color: var(--color-text-subtle);
   white-space: nowrap;
@@ -78,18 +78,18 @@
 
 @media (max-width: 640px) {
   .row {
-    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-columns: var(--size-avatar-sm) minmax(0, 1fr) auto;
     grid-template-areas:
       'avatar main amount'
       'avatar main status';
     column-gap: var(--space-3);
-    row-gap: 6px;
+    row-gap: var(--space-1_5);
     padding: var(--space-3) var(--space-4);
   }
 
   .avatar > * {
-    width: 36px;
-    height: 36px;
+    width: var(--size-avatar-sm);
+    height: var(--size-avatar-sm);
   }
 
   .status {

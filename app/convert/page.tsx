@@ -2,14 +2,19 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import type { Conversion, Currency } from '@/types/api'
-import { CURRENCIES } from '@/types/api'
+import { CURRENCIES, isCurrency } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
 import { ApiError } from '@/lib/api/client'
 import { convert } from '@/lib/api/endpoints'
 import { parseMoney } from '@/lib/format'
+import { convertMinorFloor, portionOfMinor } from '@/lib/rates/convert'
 import { useRateQuery } from '@/lib/rates/queries'
 import { useMeQuery } from '@/lib/user/queries'
 import styles from './page.module.css'
+
+/** Conversion fee: 1.5% (API.md). */
+const FEE_NUMERATOR = 15
+const FEE_DENOMINATOR = 1000
 
 const CURRENCY_OPTIONS = CURRENCIES.map((c) => ({ value: c, label: c }))
 
@@ -37,8 +42,9 @@ export default function ConvertPage() {
   const inFlight = useRef(false)
   const attempt = useRef<{ signature: string; key: string } | null>(null)
   const value = parseMoney(amount, from) ?? 0
-  const fee = Math.round(value * 0.015)
-  const youGet = rate ? Math.floor(value * rate.rate) : 0
+  // Mirrors the server (1.5% fee; you receive floor(amount x rate)) using exact integer math.
+  const fee = portionOfMinor(value, FEE_NUMERATOR, FEE_DENOMINATOR)
+  const youGet = rate ? convertMinorFloor(value, rate.rate) : 0
   const wallet = user?.wallets.find((w) => w.currency === from)
   const canSubmit = value > 0 && from !== to && !submitting
 
@@ -88,7 +94,7 @@ export default function ConvertPage() {
             label="From"
             options={CURRENCY_OPTIONS}
             value={from}
-            onChange={(e) => setFrom(e.target.value as Currency)}
+            onChange={(value) => isCurrency(value) && setFrom(value)}
             fieldClassName={styles.currency}
           />
           <Input
@@ -115,7 +121,7 @@ export default function ConvertPage() {
           label="To"
           options={CURRENCY_OPTIONS}
           value={to}
-          onChange={(e) => setTo(e.target.value as Currency)}
+          onChange={(value) => isCurrency(value) && setTo(value)}
           fieldClassName={styles.to}
         />
 

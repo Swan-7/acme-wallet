@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  height: 36px;
+  height: var(--size-page-button);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   background: transparent;
@@ -30,10 +30,10 @@
 }
 
 .step {
-  height: 32px;
+  height: var(--size-control-sm);
   gap: var(--space-2);
   margin-inline: var(--space-1);
-  padding: 0 13px;
+  padding: 0 var(--space-step-inset);
   border-color: var(--color-border);
   background: var(--color-surface);
   font-size: var(--text-sm);
@@ -50,7 +50,7 @@
 }
 
 .page {
-  min-width: 36px;
+  min-width: var(--size-page-button);
   padding: 0 var(--space-2);
   font-variant-numeric: tabular-nums;
 }
@@ -68,7 +68,7 @@
 }
 
 .ellipsis {
-  min-width: 28px;
+  min-width: var(--size-page-gap);
   text-align: center;
   color: var(--color-text-subtle);
 }

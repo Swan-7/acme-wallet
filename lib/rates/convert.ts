@@ -23,6 +23,28 @@ export function convertMinor(minor: number, rate: number): number {
   return Number(negative ? -rounded : rounded)
 }
 
+/**
+ * Convert and round *down* to the minor unit, which is how the convert endpoint computes what you
+ * receive (`Math.floor(amount * rate)`). Exact, so it never disagrees with the server by a float artefact.
+ */
+export function convertMinorFloor(minor: number, rate: number): number {
+  if (!Number.isSafeInteger(minor) || minor < 0) throw new RangeError('amount must be a non-negative integer')
+  if (!Number.isFinite(rate) || rate < 0) throw new RangeError('rate must be a finite, non-negative number')
+  const product = BigInt(minor) * BigInt(Math.round(rate * RATE_SCALE))
+  return Number(product / RATE_SCALE_BIG)
+}
+
+/**
+ * `numerator / denominator` of an amount, rounded half up. The convert endpoint charges 1.5%, i.e.
+ * 15/1000, as `Math.round(amount * 0.015)`; this gives the same value without float arithmetic.
+ */
+export function portionOfMinor(minor: number, numerator: number, denominator: number): number {
+  if (!Number.isSafeInteger(minor) || minor < 0) throw new RangeError('amount must be a non-negative integer')
+  const product = BigInt(minor) * BigInt(numerator)
+  const divisor = BigInt(denominator)
+  return Number((product * 2n + divisor) / (divisor * 2n))
+}
+
 export type RatesToBase = Partial<Record<Currency, number>>
 
 /**

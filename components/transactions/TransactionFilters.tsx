@@ -1,7 +1,7 @@
 'use client'
 import type { KeyboardEvent } from 'react'
 import type { TransactionStatus, TransactionType } from '@/types/api'
-import { Button, Dropdown, Input, type DropdownOption } from '@/components/ui'
+import { Button, Select, Input, type SelectOption } from '@/components/ui'
 import { cx } from '@/lib/cx'
 import { TRANSACTION_STATUS_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 import { SEARCH_MAX_LENGTH } from '@/lib/transactions/params'
@@ -10,12 +10,12 @@ import { useMediaQuery } from './useMediaQuery'
 
 const ALL = ''
 
-const TYPE_OPTIONS: DropdownOption[] = [
+const TYPE_OPTIONS: SelectOption[] = [
   { value: ALL, label: 'All types' },
   ...Object.entries(TRANSACTION_TYPE_LABELS).map(([value, label]) => ({ value, label })),
 ]
 
-const STATUS_OPTIONS: DropdownOption[] = [
+const STATUS_OPTIONS: SelectOption[] = [
   { value: ALL, label: 'All statuses' },
   ...Object.entries(TRANSACTION_STATUS_LABELS).map(([value, label]) => ({ value, label })),
 ]
@@ -71,14 +71,14 @@ export function TransactionFilters({
         enterKeyHint="search"
         fieldClassName={styles.search}
       />
-      <Dropdown
+      <Select
         label="Type"
         options={TYPE_OPTIONS}
         value={type ?? ALL}
         onChange={onTypeChange}
         fieldClassName={styles.type}
       />
-      <Dropdown
+      <Select
         label="Status"
         options={STATUS_OPTIONS}
         value={status ?? ALL}

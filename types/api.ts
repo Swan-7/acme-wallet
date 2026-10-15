@@ -4,6 +4,9 @@ export type Currency = 'NGN' | 'USD' | 'GHS'
 
 export const CURRENCIES: readonly Currency[] = ['NGN', 'USD', 'GHS']
 
+export const isCurrency = (value: string): value is Currency =>
+  (CURRENCIES as readonly string[]).includes(value)
+
 export type TransactionType =
   'deposit' | 'withdrawal' | 'transfer_in' | 'transfer_out' | 'conversion' | 'card_payment' | 'bill_payment'
 

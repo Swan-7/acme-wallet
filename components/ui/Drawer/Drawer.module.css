@@ -50,8 +50,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--size-icon-button);
+  height: var(--size-icon-button);
   border: 0;
   border-radius: var(--radius-md);
   background: transparent;
@@ -88,14 +88,14 @@
 
 @keyframes slide-in {
   from {
-    transform: translateX(24px);
+    transform: translateX(var(--space-6));
     opacity: 0;
   }
 }
 
 @keyframes slide-up {
   from {
-    transform: translateY(24px);
+    transform: translateY(var(--space-6));
     opacity: 0;
   }
 }
@@ -123,8 +123,8 @@
 
   .grabber {
     display: block;
-    width: 36px;
-    height: 4px;
+    width: var(--size-grabber-width);
+    height: var(--size-grabber-height);
     margin: var(--space-2) auto 0;
     border-radius: var(--radius-full);
     background: var(--color-border-strong);

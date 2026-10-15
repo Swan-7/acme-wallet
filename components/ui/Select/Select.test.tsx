@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { Dropdown } from './Dropdown'
+import { Select } from './Select'
 
 const OPTIONS = [
   { value: '', label: 'All types' },
@@ -14,7 +14,7 @@ function Harness({ onChange = () => {} }: { onChange?: (value: string) => void }
   const [value, setValue] = useState('')
   return (
     <>
-      <Dropdown
+      <Select
         label="Type"
         options={OPTIONS}
         value={value}
@@ -30,7 +30,7 @@ function Harness({ onChange = () => {} }: { onChange?: (value: string) => void }
 
 const trigger = () => screen.getByRole('combobox', { name: 'Type' })
 
-describe('Dropdown', () => {
+describe('Select', () => {
   it('shows the selected label and is closed initially', () => {
     render(<Harness />)
     expect(trigger()).toHaveTextContent('All types')
