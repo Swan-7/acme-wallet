@@ -65,7 +65,9 @@
 
 .body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--space-6);
 }
 
@@ -111,6 +113,12 @@
     height: auto;
     max-height: 90dvh;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  /* The dialog is content-sized here, so the panel must carry the height limit for the body to scroll. */
+  .panel {
+    height: auto;
+    max-height: 90dvh;
   }
 
   .grabber {

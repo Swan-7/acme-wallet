@@ -61,18 +61,18 @@ describe('TransactionsView filters', () => {
     expect(screen.getByText('1 transaction')).toBeInTheDocument()
   })
 
-  it('renders hostile narration as text, not HTML', async () => {
+  it('never renders upstream narration as HTML and hides markup noise', async () => {
     vi.mocked(fetch).mockImplementationOnce(
       async () =>
         new Response(
           JSON.stringify({
-            data: [tx({ narration: '<img src=x onerror="window.__pwned=1">' })],
+            data: [tx({ narration: 'Bill payment - Spectranet <img src=x onerror="window.__pwned=1">' })],
             meta: { page: 1, limit: 20, total: 1, totalPages: 1 },
           })
         )
     )
     const { container } = renderView()
-    expect(await screen.findByText('<img src=x onerror="window.__pwned=1">')).toBeInTheDocument()
+    expect(await screen.findByText('Bill payment - Spectranet')).toBeInTheDocument()
     expect(container.querySelector('img')).toBeNull()
   })
 

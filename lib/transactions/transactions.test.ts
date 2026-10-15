@@ -1,5 +1,6 @@
 import { formatDate, formatTime } from '@/lib/format'
 import { groupByDay } from './group'
+import { displayText } from './text'
 import { getInitials } from './initials'
 import { getPageItems } from '@/lib/pagination'
 import { applyTransactionParams, hasActiveFilters, parseTransactionParams, toApiQuery } from './params'
@@ -194,5 +195,20 @@ describe('date formatting', () => {
   it('uses 24-hour time', () => {
     const iso = new Date(2026, 9, 5, 7, 5).toISOString()
     expect(formatTime(iso)).toBe('07:05')
+  })
+})
+
+describe('displayText', () => {
+  it('drops tag-shaped markup but keeps the readable text', () => {
+    expect(displayText('Bill payment - Spectranet <img src="x" onerror="console.warn(\'x\')">')).toBe(
+      'Bill payment - Spectranet'
+    )
+    expect(displayText('Hi <script>alert(1)</script> there')).toBe('Hi alert(1) there')
+  })
+
+  it('leaves ordinary text, comparisons and ampersands alone', () => {
+    expect(displayText('Okonkwo & Sons Ltd')).toBe('Okonkwo & Sons Ltd')
+    expect(displayText('Paid 5 < 10 > 2 items')).toBe('Paid 5 < 10 > 2 items')
+    expect(displayText('Card payment - GOOGLE *CLOUD')).toBe('Card payment - GOOGLE *CLOUD')
   })
 })

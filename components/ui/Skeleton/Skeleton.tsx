@@ -7,15 +7,17 @@ export interface SkeletonProps {
   height?: CSSProperties['height']
   /** Fully round, for avatars. */
   circle?: boolean
+  /** Corner radius when not a pill, e.g. a form-control placeholder. */
+  radius?: CSSProperties['borderRadius']
   className?: string
 }
 
 /** Decorative loading placeholder. Pair it with a visible or screen-reader-only status message. */
-export function Skeleton({ width, height = 12, circle, className }: SkeletonProps) {
+export function Skeleton({ width, height = 12, circle, radius, className }: SkeletonProps) {
   return (
     <span
       className={cx(styles.skeleton, circle && styles.circle, className)}
-      style={{ width, height }}
+      style={{ width, height, borderRadius: circle ? undefined : radius }}
       aria-hidden
     />
   )
