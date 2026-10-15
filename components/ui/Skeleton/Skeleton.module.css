@@ -1,23 +1,12 @@
+/* Static placeholder: the design specifies a flat #ECECF3 fill with no animation. */
 .skeleton {
   display: block;
   max-width: 100%;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   background: var(--color-border);
 }
 
 .circle {
   flex: none;
   border-radius: var(--radius-full);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .skeleton {
-    animation: pulse 1.4s ease-in-out infinite;
-  }
-}
-
-@keyframes pulse {
-  50% {
-    opacity: 0.55;
-  }
 }

@@ -1,8 +1,10 @@
 import { useMemo } from 'react'
 import type { Transaction } from '@/types/api'
 import { Skeleton } from '@/components/ui'
+import { cx } from '@/lib/cx'
 import { groupByDay } from '@/lib/transactions/group'
 import { TransactionRow } from './TransactionRow'
+import { TransactionRowSkeleton } from './TransactionRowSkeleton'
 import styles from './TransactionList.module.css'
 
 export interface TransactionListProps {
@@ -37,25 +39,15 @@ export function TransactionList({ transactions, onSelect, isRefreshing }: Transa
 /** First-load placeholder: a day heading and six rows, as in the design. */
 export function TransactionListSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div className={styles.card} role="status" aria-label="Loading transactions">
+    <div className={cx(styles.card, styles.skeletonCard)} role="status" aria-label="Loading transactions">
       <div className={styles.groupTitle}>
         <Skeleton width={64} height={10} />
       </div>
-      <ul className={styles.items}>
+      <div>
         {Array.from({ length: rows }, (_, i) => (
-          <li key={i} className={styles.skeletonRow}>
-            <Skeleton circle width={40} height={40} />
-            <span className={styles.skeletonMain}>
-              <Skeleton width={120} height={12} />
-              <Skeleton width={260} height={10} />
-            </span>
-            <span className={styles.skeletonEnd}>
-              <Skeleton width={96} height={12} />
-              <Skeleton width={40} height={10} />
-            </span>
-          </li>
+          <TransactionRowSkeleton key={i} />
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

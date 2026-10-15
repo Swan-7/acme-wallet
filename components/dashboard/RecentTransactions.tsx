@@ -1,28 +1,20 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { Transaction } from '@/types/api'
-import { Card, CardHeader, Drawer } from '@/components/ui'
+import { Button, Card, CardHeader, Drawer, EmptyState } from '@/components/ui'
 import { TransactionDetails, TransactionRow } from '@/components/transactions'
-import { getTransactions } from '@/lib/api/endpoints'
+import { TransactionRowSkeleton } from '@/components/transactions/TransactionRowSkeleton'
+import { DEFAULT_PARAMS } from '@/lib/transactions/params'
+import { useTransactionsQuery } from '@/lib/transactions/queries'
 import styles from './RecentTransactions.module.css'
+
+const RECENT_COUNT = 5
 
 export function RecentTransactions() {
   const [selected, setSelected] = useState<Transaction | null>(null)
-  const [transactions, setTransactions] = useState<Transaction[]>()
-  const [isLoading, setIsLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
-
-  useEffect(() => {
-    const controller = new AbortController()
-    getTransactions({ limit: 5 }, { signal: controller.signal })
-      .then((res) => setTransactions(res.data))
-      .catch(() => setHasError(true))
-      .finally(() => {
-        if (!controller.signal.aborted) setIsLoading(false)
-      })
-    return () => controller.abort()
-  }, [])
+  const query = useTransactionsQuery(DEFAULT_PARAMS, RECENT_COUNT)
+  const transactions = query.data?.items
 
   return (
     <Card padding="none">
@@ -36,16 +28,44 @@ export function RecentTransactions() {
           }
         />
       </div>
-      {isLoading && <p className={styles.message}>Loading…</p>}
-      {!isLoading && hasError && (
-        <p className={styles.message}>We couldn&apos;t load your transactions. Please try again later.</p>
+
+      {transactions ? (
+        transactions.length > 0 ? (
+          <ul className={styles.list}>
+            {transactions.map((tx) => (
+              <li key={tx.id} className={styles.item}>
+                <TransactionRow transaction={tx} onSelect={setSelected} timestamp="datetime" />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState
+            role="status"
+            icon="inbox"
+            title="No transactions yet"
+            description="When you add money, send a transfer or pay with your card, it will show up here."
+          />
+        )
+      ) : query.isError ? (
+        <EmptyState
+          role="alert"
+          icon="alert"
+          tone="danger"
+          title="We couldn’t load your transactions"
+          description="Check your connection and try again."
+          action={
+            <Button iconLeft="refresh" onClick={() => void query.refetch()}>
+              Try again
+            </Button>
+          }
+        />
+      ) : (
+        <div role="status" aria-label="Loading transactions">
+          {Array.from({ length: RECENT_COUNT }, (_, i) => (
+            <TransactionRowSkeleton key={i} />
+          ))}
+        </div>
       )}
-      {!isLoading && !hasError && !transactions?.length && (
-        <p className={styles.message}>No transactions yet.</p>
-      )}
-      {transactions?.map((tx) => (
-        <TransactionRow key={tx.id} transaction={tx} onSelect={setSelected} timestamp="datetime" />
-      ))}
 
       <Drawer open={selected !== null} title="Transaction details" onClose={() => setSelected(null)}>
         {selected && (

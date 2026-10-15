@@ -1,11 +1,13 @@
 'use client'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import type { Conversion, Currency, Rate, User } from '@/types/api'
+import type { Conversion, Currency, Rate } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
 import { ApiError } from '@/lib/api/client'
-import { convert, getMe, getRate } from '@/lib/api/endpoints'
+import { convert, getRate } from '@/lib/api/endpoints'
 import { parseMoney } from '@/lib/format'
+import { useMeQuery } from '@/lib/user/queries'
 import styles from './page.module.css'
 
 const CURRENCY_OPTIONS = CURRENCIES.map((c) => ({ value: c, label: c }))
@@ -18,16 +20,9 @@ export default function ConvertPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  const [user, setUser] = useState<User>()
+  const queryClient = useQueryClient()
+  const user = useMeQuery().data
   const [fetchedRate, setFetchedRate] = useState<Rate>()
-
-  useEffect(() => {
-    const controller = new AbortController()
-    getMe({ signal: controller.signal })
-      .then((res) => setUser(res.data))
-      .catch(() => {})
-    return () => controller.abort()
-  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -53,6 +48,9 @@ export default function ConvertPage() {
       const res = await convert({ from, to, amount: value })
       setResult(res.data)
       setAmount('')
+      // Balances and history changed: refresh the dashboard and transactions views.
+      void queryClient.invalidateQueries({ queryKey: ['me'] })
+      void queryClient.invalidateQueries({ queryKey: ['transactions'] })
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.')
     } finally {

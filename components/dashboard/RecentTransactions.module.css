@@ -8,8 +8,10 @@
   color: var(--color-primary);
 }
 
-.message {
-  padding: var(--space-6);
-  font-size: var(--text-md);
-  color: var(--color-text-muted);
+.list {
+  list-style: none;
+}
+
+.item + .item {
+  border-top: 1px solid var(--color-border);
 }

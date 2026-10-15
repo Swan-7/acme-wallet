@@ -155,7 +155,7 @@ function DetailsSkeleton() {
         <Skeleton circle width={48} height={48} />
         <Skeleton width={160} height={12} />
         <Skeleton width={200} height={24} />
-        <Skeleton width={84} height={22} />
+        <Skeleton width={84} height={22} radius="var(--radius-full)" />
       </div>
       <div className={styles.skeletonRows}>
         {Array.from({ length: 4 }, (_, i) => (

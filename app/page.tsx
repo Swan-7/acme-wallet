@@ -1,45 +1,49 @@
 'use client'
-import { useEffect, useState } from 'react'
-import type { User } from '@/types/api'
+import { Button, Card, EmptyState } from '@/components/ui'
 import { BalanceSummary, RatesWidget, RecentTransactions, WalletCard } from '@/components/dashboard'
-import { getMe } from '@/lib/api/endpoints'
+import { BalanceSummarySkeleton, WalletCardSkeleton } from '@/components/dashboard/DashboardSkeletons'
+import { CURRENCIES } from '@/types/api'
+import { useMeQuery } from '@/lib/user/queries'
 import styles from './page.module.css'
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User>()
-  const [isLoading, setIsLoading] = useState(true)
+  const me = useMeQuery()
+  const user = me.data
 
-  useEffect(() => {
-    const controller = new AbortController()
-    getMe({ signal: controller.signal })
-      .then((res) => setUser(res.data))
-      .catch(() => {
-        // Handled below: `user` stays undefined.
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setIsLoading(false)
-      })
-    return () => controller.abort()
-  }, [])
-
-  if (isLoading) return <p className={styles.loading}>Loading…</p>
-  if (!user) {
-    return <p className={styles.loading}>We couldn&apos;t load your account. Please refresh to try again.</p>
+  if (me.isError && !user) {
+    return (
+      <div className={styles.page}>
+        <Card>
+          <EmptyState
+            role="alert"
+            icon="alert"
+            tone="danger"
+            title="We couldn’t load your account"
+            description="Check your connection and try again."
+            action={
+              <Button iconLeft="refresh" onClick={() => void me.refetch()}>
+                Try again
+              </Button>
+            }
+          />
+        </Card>
+      </div>
+    )
   }
 
   return (
     <div className={styles.page}>
       <header>
-        <h1 className={styles.title}>Welcome back, {user.firstName}</h1>
+        <h1 className={styles.title}>{user ? `Welcome back, ${user.firstName}` : 'Welcome back'}</h1>
         <p className={styles.subtitle}>Here&apos;s what&apos;s happening with your money today.</p>
       </header>
 
-      <BalanceSummary wallets={user.wallets} />
+      {user ? <BalanceSummary wallets={user.wallets} /> : <BalanceSummarySkeleton />}
 
       <div className={styles.wallets}>
-        {user.wallets.map((wallet) => (
-          <WalletCard key={wallet.currency} wallet={wallet} />
-        ))}
+        {user
+          ? user.wallets.map((wallet) => <WalletCard key={wallet.currency} wallet={wallet} />)
+          : CURRENCIES.map((currency) => <WalletCardSkeleton key={currency} />)}
       </div>
 
       <div className={styles.columns}>

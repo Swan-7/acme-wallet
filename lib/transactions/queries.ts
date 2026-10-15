@@ -1,14 +1,14 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import type { Transaction } from '@/types/api'
 import { getTransaction, getTransactions } from '@/lib/api/endpoints'
-import { toApiQuery, type TransactionParams } from './params'
+import { PAGE_SIZE, toApiQuery, type TransactionParams } from './params'
 
 /** Only the fields that change the result set: opening a drawer must not refetch the list. */
 type ListParams = Pick<TransactionParams, 'q' | 'type' | 'status' | 'page'>
 
 export const transactionKeys = {
-  list: (params: ListParams) =>
-    ['transactions', 'list', params.q, params.type, params.status, params.page] as const,
+  list: (params: ListParams, limit: number) =>
+    ['transactions', 'list', params.q, params.type, params.status, params.page, limit] as const,
   detail: (id: string) => ['transactions', 'detail', id] as const,
 }
 
@@ -16,11 +16,11 @@ export const transactionKeys = {
  * One page of transactions. While the next page / filter result loads, the previous one stays available
  * (`placeholderData`), as the design requires. The abort signal cancels superseded requests.
  */
-export function useTransactionsQuery(params: ListParams) {
+export function useTransactionsQuery(params: ListParams, limit: number = PAGE_SIZE) {
   return useQuery({
-    queryKey: transactionKeys.list(params),
+    queryKey: transactionKeys.list(params, limit),
     queryFn: async ({ signal }) => {
-      const res = await getTransactions(toApiQuery({ ...params, tx: null }), { signal })
+      const res = await getTransactions({ ...toApiQuery({ ...params, tx: null }), limit }, { signal })
       if (!res.meta) throw new Error('Missing pagination metadata')
       return { items: res.data, meta: res.meta }
     },
