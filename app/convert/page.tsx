@@ -1,16 +1,22 @@
 'use client'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
-import type { Conversion, Currency, Rate } from '@/types/api'
+import { useRef, useState } from 'react'
+import type { Conversion, Currency } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
 import { ApiError } from '@/lib/api/client'
-import { convert, getRate } from '@/lib/api/endpoints'
+import { convert } from '@/lib/api/endpoints'
 import { parseMoney } from '@/lib/format'
+import { useRateQuery } from '@/lib/rates/queries'
 import { useMeQuery } from '@/lib/user/queries'
 import styles from './page.module.css'
 
 const CURRENCY_OPTIONS = CURRENCIES.map((c) => ({ value: c, label: c }))
+
+/** crypto.randomUUID needs a secure context; fall back for plain-http LAN testing. */
+function newIdempotencyKey(): string {
+  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
 
 export default function ConvertPage() {
   const [from, setFrom] = useState<Currency>('USD')
@@ -22,18 +28,14 @@ export default function ConvertPage() {
 
   const queryClient = useQueryClient()
   const user = useMeQuery().data
-  const [fetchedRate, setFetchedRate] = useState<Rate>()
+  // Keyed by the pair, so a rate for a previous pair is never shown while the new one loads.
+  const rate = useRateQuery(from, to).data
 
-  useEffect(() => {
-    const controller = new AbortController()
-    getRate(from, to, { signal: controller.signal })
-      .then((res) => setFetchedRate(res.data))
-      .catch(() => {})
-    return () => controller.abort()
-  }, [from, to])
-
-  // Ignore a rate fetched for a previous currency pair while the new one loads.
-  const rate = fetchedRate?.from === from && fetchedRate.to === to ? fetchedRate : undefined
+  // Single-flight lock (state updates are async, so a fast double-tap could otherwise submit twice) and
+  // the idempotency key for the current intent. The key is kept across an unconfirmed outcome so a manual
+  // retry of the same conversion is recognisable as the same request.
+  const inFlight = useRef(false)
+  const attempt = useRef<{ signature: string; key: string } | null>(null)
   const value = parseMoney(amount, from) ?? 0
   const fee = Math.round(value * 0.015)
   const youGet = rate ? Math.floor(value * rate.rate) : 0
@@ -41,19 +43,37 @@ export default function ConvertPage() {
   const canSubmit = value > 0 && from !== to && !submitting
 
   const handleConvert = async () => {
-    if (!canSubmit) return
+    if (!canSubmit || inFlight.current) return
+    inFlight.current = true
     setError('')
     setSubmitting(true)
+
+    const signature = `${from}:${to}:${value}`
+    if (attempt.current?.signature !== signature) attempt.current = { signature, key: newIdempotencyKey() }
+    const key = attempt.current.key
+
     try {
-      const res = await convert({ from, to, amount: value })
+      const res = await convert({ from, to, amount: value }, { headers: { 'Idempotency-Key': key } })
+      attempt.current = null
       setResult(res.data)
       setAmount('')
-      // Balances and history changed: refresh the dashboard and transactions views.
+    } catch (err) {
+      if (err instanceof ApiError && !err.isRetryable) {
+        // The server definitively refused it (validation, insufficient funds): a fresh intent next time.
+        attempt.current = null
+        setError(err.message)
+      } else {
+        // Network drop or 5xx: we do not know whether the conversion was applied. Say so, and reconcile
+        // against the server rather than claiming success or failure.
+        setError(
+          'We couldn’t confirm whether this conversion went through. Check your transactions before trying again.'
+        )
+      }
+    } finally {
+      // Whatever happened, balances and history may have changed: refresh them from the server.
       void queryClient.invalidateQueries({ queryKey: ['me'] })
       void queryClient.invalidateQueries({ queryKey: ['transactions'] })
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Something went wrong. Please try again.')
-    } finally {
+      inFlight.current = false
       setSubmitting(false)
     }
   }

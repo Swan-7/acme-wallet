@@ -20,3 +20,17 @@
   font-size: var(--text-xs);
   color: var(--color-text-subtle);
 }
+
+.updatedSkeleton {
+  margin-top: var(--space-3);
+}
+
+.retry {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  cursor: pointer;
+}

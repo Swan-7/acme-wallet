@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import type { Transaction } from '@/types/api'
 import { Skeleton } from '@/components/ui'
 import { cx } from '@/lib/cx'
@@ -15,7 +15,11 @@ export interface TransactionListProps {
 }
 
 /** Transactions grouped under day headings (Today / Yesterday / date), inside the list card. */
-export function TransactionList({ transactions, onSelect, isRefreshing }: TransactionListProps) {
+export const TransactionList = memo(function TransactionList({
+  transactions,
+  onSelect,
+  isRefreshing,
+}: TransactionListProps) {
   const groups = useMemo(() => groupByDay(transactions), [transactions])
 
   return (
@@ -34,7 +38,7 @@ export function TransactionList({ transactions, onSelect, isRefreshing }: Transa
       ))}
     </div>
   )
-}
+})
 
 /** First-load placeholder: a day heading and six rows, as in the design. */
 export function TransactionListSkeleton({ rows = 6 }: { rows?: number }) {

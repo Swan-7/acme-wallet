@@ -93,9 +93,14 @@
     display: inline;
   }
 
+  /* The 4px outer margin is a desktop detail; on mobile the buttons sit flush with the card edges. */
+  .step {
+    margin-inline: 0;
+  }
+
   .summary {
     display: block;
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     font-weight: var(--weight-medium);
   }
 }

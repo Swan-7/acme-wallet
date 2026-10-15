@@ -42,5 +42,5 @@ export const getTransaction = (id: string, init?: RequestInit) =>
 export const getRate = (from: Currency, to: Currency, init?: RequestInit) =>
   api.get<Rate>(`/rates${toSearchParams({ from, to })}`, init)
 
-export const convert = (body: { from: Currency; to: Currency; amount: number }) =>
-  api.post<Conversion>('/convert', body)
+export const convert = (body: { from: Currency; to: Currency; amount: number }, init?: RequestInit) =>
+  api.post<Conversion>('/convert', body, init)

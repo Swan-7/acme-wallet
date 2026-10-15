@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Transaction } from '@/types/api'
 import { Money } from '@/components/ui'
 import { cx } from '@/lib/cx'
@@ -17,7 +18,11 @@ export interface TransactionRowProps {
   timestamp?: 'time' | 'datetime'
 }
 
-export function TransactionRow({ transaction: tx, onSelect, timestamp = 'time' }: TransactionRowProps) {
+export const TransactionRow = memo(function TransactionRow({
+  transaction: tx,
+  onSelect,
+  timestamp = 'time',
+}: TransactionRowProps) {
   const isCredit = isCreditType(tx.type)
 
   return (
@@ -35,11 +40,12 @@ export function TransactionRow({ transaction: tx, onSelect, timestamp = 'time' }
         amount={tx.amount}
         currency={tx.currency}
         sign={isCredit ? 'credit' : 'debit'}
-        className={cx(styles.amount, isCredit && styles.credit)}
+        // A failed credit never arrived, so it is not drawn as money received.
+        className={cx(styles.amount, isCredit && tx.status !== 'failed' && styles.credit)}
       />
       <span className={cx(styles.meta, timestamp === 'time' && styles.metaHiddenOnMobile)}>
         {timestamp === 'time' ? formatTime(tx.createdAt) : formatDateTime(tx.createdAt)}
       </span>
     </button>
   )
-}
+})

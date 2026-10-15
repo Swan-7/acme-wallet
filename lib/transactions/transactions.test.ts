@@ -1,6 +1,7 @@
 import { formatDate, formatTime } from '@/lib/format'
 import { groupByDay } from './group'
 import { displayText } from './text'
+import { transactionTotal } from './total'
 import { getInitials } from './initials'
 import { getPageItems } from '@/lib/pagination'
 import { applyTransactionParams, hasActiveFilters, parseTransactionParams, toApiQuery } from './params'
@@ -210,5 +211,21 @@ describe('displayText', () => {
     expect(displayText('Okonkwo & Sons Ltd')).toBe('Okonkwo & Sons Ltd')
     expect(displayText('Paid 5 < 10 > 2 items')).toBe('Paid 5 < 10 > 2 items')
     expect(displayText('Card payment - GOOGLE *CLOUD')).toBe('Card payment - GOOGLE *CLOUD')
+  })
+})
+
+describe('transactionTotal', () => {
+  it('is amount + fee for debits', () => {
+    expect(transactionTotal({ type: 'transfer_out', amount: 120_000, fee: 1_200 })).toBe(121_200)
+    expect(transactionTotal({ type: 'card_payment', amount: 4_599, fee: 0 })).toBe(4_599)
+  })
+
+  it('is the amount for fee-free credits', () => {
+    expect(transactionTotal({ type: 'deposit', amount: 50_000_000, fee: 0 })).toBe(50_000_000)
+  })
+
+  it('refuses to invent a total for conversions and for credits that carry a fee', () => {
+    expect(transactionTotal({ type: 'conversion', amount: 3_058_969, fee: 4_590 })).toBeNull()
+    expect(transactionTotal({ type: 'transfer_in', amount: 10_000, fee: 100 })).toBeNull()
   })
 })

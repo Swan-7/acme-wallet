@@ -3,9 +3,11 @@ import { useEffect, useRef, useState } from 'react'
 import type { Transaction } from '@/types/api'
 import { Button, EmptyState, Icon, Money, Skeleton } from '@/components/ui'
 import { ApiError } from '@/lib/api/client'
+import { cx } from '@/lib/cx'
 import { formatDateTime, formatMoney, isCreditType, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 import { useTransactionQuery } from '@/lib/transactions/queries'
 import { displayText } from '@/lib/transactions/text'
+import { transactionTotal } from '@/lib/transactions/total'
 import { StatusBadge } from './StatusBadge'
 import { TransactionAvatar } from './TransactionAvatar'
 import styles from './TransactionDetails.module.css'
@@ -60,8 +62,8 @@ export function TransactionDetails({ id, initialData, onClose }: TransactionDeta
 
 function Loaded({ transaction: tx }: { transaction: Transaction }) {
   const isCredit = isCreditType(tx.type)
-  // Fee is charged on top of the amount, in the transaction's own currency (API.md).
-  const total = tx.amount + tx.fee
+  // null when the record cannot state a truthful total (see transactionTotal).
+  const total = transactionTotal(tx)
 
   return (
     <div className={styles.root}>
@@ -100,10 +102,12 @@ function Loaded({ transaction: tx }: { transaction: Transaction }) {
         <dl className={styles.list}>
           <Row label="Amount">{formatMoney(tx.amount, tx.currency)}</Row>
           <Row label="Fee">{formatMoney(tx.fee, tx.currency)}</Row>
-          <div className={styles.total}>
-            <dt>Total</dt>
-            <dd>{formatMoney(total, tx.currency)}</dd>
-          </div>
+          {total !== null && (
+            <div className={styles.total}>
+              <dt>Total</dt>
+              <dd>{formatMoney(total, tx.currency)}</dd>
+            </div>
+          )}
         </dl>
       </section>
     </div>
@@ -119,32 +123,48 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   )
 }
 
+type CopyState = 'idle' | 'copied' | 'failed'
+const COPY_FEEDBACK_MS = 1500
+
 function CopyButton({ value }: { value: string }) {
-  const [copied, setCopied] = useState(false)
+  const [state, setState] = useState<CopyState>('idle')
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => () => clearTimeout(timer.current), [])
 
+  const flash = (next: CopyState) => {
+    setState(next)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => setState('idle'), COPY_FEEDBACK_MS)
+  }
+
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(value)
-      setCopied(true)
-      clearTimeout(timer.current)
-      timer.current = setTimeout(() => setCopied(false), 1500)
+      flash('copied')
     } catch {
-      // Clipboard can be unavailable (insecure context, denied permission). The reference stays selectable.
+      // Clipboard can be unavailable (insecure context, denied permission). Say so instead of failing silently.
+      flash('failed')
     }
   }
 
+  const message = state === 'copied' ? 'Copied' : state === 'failed' ? 'Couldn’t copy' : ''
+
   return (
-    <>
-      <button type="button" className={styles.copy} onClick={copy} aria-label="Copy reference">
-        <Icon name="copy" size={16} />
+    <span className={styles.copyWrap}>
+      <button
+        type="button"
+        className={cx(styles.copy, state === 'copied' && styles.copied)}
+        onClick={copy}
+        aria-label="Copy reference"
+      >
+        <Icon name={state === 'copied' ? 'check' : 'copy'} size={16} />
       </button>
-      <span className="visually-hidden" role="status">
-        {copied ? 'Reference copied' : ''}
+      {/* Visible for a moment and announced to assistive tech via the live region. */}
+      <span role="status" className={message ? styles.copyTip : 'visually-hidden'}>
+        {message}
       </span>
-    </>
+    </span>
   )
 }
 

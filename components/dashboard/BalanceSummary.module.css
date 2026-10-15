@@ -16,3 +16,28 @@
   font-weight: var(--weight-heavy);
   letter-spacing: -0.02em;
 }
+
+.totalSkeleton {
+  margin-top: var(--space-1);
+}
+
+.noteSkeleton {
+  margin-top: var(--space-2);
+}
+
+/* Faint helper line: this is an estimate, not a ledger balance. */
+.note {
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+.retry {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  cursor: pointer;
+}

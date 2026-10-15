@@ -4,6 +4,9 @@ import { getTransaction, getTransactions } from '@/lib/api/endpoints'
 import { PAGE_SIZE, toApiQuery, type TransactionParams } from './params'
 
 /** Only the fields that change the result set: opening a drawer must not refetch the list. */
+/** How often to re-check while a transaction is pending. Paused automatically in background tabs. */
+const PENDING_POLL_MS = 15_000
+
 type ListParams = Pick<TransactionParams, 'q' | 'type' | 'status' | 'page'>
 
 export const transactionKeys = {
@@ -25,6 +28,9 @@ export function useTransactionsQuery(params: ListParams, limit: number = PAGE_SI
       return { items: res.data, meta: res.meta }
     },
     placeholderData: keepPreviousData,
+    // Reconcile: while any visible transaction is still pending, re-check instead of leaving it stale.
+    refetchInterval: (query) =>
+      query.state.data?.items.some((tx) => tx.status === 'pending') ? PENDING_POLL_MS : false,
   })
 }
 
@@ -34,5 +40,6 @@ export function useTransactionQuery(id: string, initialData?: Transaction) {
     queryKey: transactionKeys.detail(id),
     queryFn: async ({ signal }) => (await getTransaction(id, { signal })).data,
     initialData,
+    refetchInterval: (query) => (query.state.data?.status === 'pending' ? PENDING_POLL_MS : false),
   })
 }
